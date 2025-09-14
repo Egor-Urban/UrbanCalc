@@ -1,3 +1,7 @@
+use std::process::Command;
+
+
+
 pub fn get_os() -> &'static str {
     #[cfg(target_os = "windows")]
     { "Windows" }
@@ -22,4 +26,69 @@ pub fn get_os() -> &'static str {
         target_os = "ios"
     )))]
     { "Unknown" }
+}
+
+
+
+pub fn get_theme(os: &str) -> &'static str {
+    match os {
+        "Windows" => {
+            #[cfg(target_os = "windows")]
+            {
+                use winreg::enums::*;
+                use winreg::RegKey;
+
+                let hkey = RegKey::predef(HKEY_CURRENT_USER);
+                if let Ok(key) = hkey.open_subkey(
+                    "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"
+                ) {
+                    match key.get_value::<u32, _>("AppsUseLightTheme") {
+                        Ok(val) => {
+                            if val == 0 { return "Dark"; } else { return "Light"; }
+                        }
+                        Err(_) => return "Unknown",
+                    }
+                }
+            }
+            "Unknown"
+        }
+
+        "macOS" => {
+            #[cfg(target_os = "macos")]
+            {
+                if let Ok(output) = Command::new("defaults")
+                    .args(["read", "-g", "AppleInterfaceStyle"])
+                    .output()
+                {
+                    let style = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                    if style.eq_ignore_ascii_case("Dark") {
+                        return "Dark";
+                    } else if style.is_empty() {
+                        return "Light";
+                    }
+                }
+            }
+            "Unknown"
+        }
+
+        // Only gnome
+        "Linux" => {
+            #[cfg(target_os = "linux")]
+            {
+                if let Ok(output) = Command::new("gsettings")
+                    .args(["get", "org.gnome.desktop.interface", "gtk-theme"])
+                    .output()
+                {
+                    let theme = String::from_utf8_lossy(&output.stdout).to_lowercase();
+                    if theme.contains("dark") {
+                        return "Dark";
+                    } else if !theme.is_empty() {
+                        return "Light";
+                    }
+                }
+            }
+            "Unknown"
+        }
+        _ => "Unknown",
+    }
 }
