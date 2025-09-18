@@ -32,6 +32,7 @@ pub fn get_os() -> &'static str {
 
 pub fn get_theme(os: &str) -> &'static str {
     match os {
+        // NOT TESTED
         "Windows" => {
             #[cfg(target_os = "windows")]
             {
@@ -44,7 +45,7 @@ pub fn get_theme(os: &str) -> &'static str {
                 ) {
                     match key.get_value::<u32, _>("AppsUseLightTheme") {
                         Ok(val) => {
-                            if val == 0 { return "Dark"; } else { return "Light"; }
+                            if val == 0 { return "dark"; } else { return "light"; }
                         }
                         Err(_) => return "Unknown",
                     }
@@ -53,6 +54,7 @@ pub fn get_theme(os: &str) -> &'static str {
             "Unknown"
         }
 
+        // NOT TESTED
         "macOS" => {
             #[cfg(target_os = "macos")]
             {
@@ -62,9 +64,9 @@ pub fn get_theme(os: &str) -> &'static str {
                 {
                     let style = String::from_utf8_lossy(&output.stdout).trim().to_string();
                     if style.eq_ignore_ascii_case("Dark") {
-                        return "Dark";
+                        return "dark";
                     } else if style.is_empty() {
-                        return "Light";
+                        return "light";
                     }
                 }
             }
@@ -81,9 +83,9 @@ pub fn get_theme(os: &str) -> &'static str {
                 {
                     let theme = String::from_utf8_lossy(&output.stdout).to_lowercase();
                     if theme.contains("dark") {
-                        return "Dark";
+                        return "dark";
                     } else if !theme.is_empty() {
-                        return "Light";
+                        return "light";
                     }
                 }
             }

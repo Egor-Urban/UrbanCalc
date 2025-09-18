@@ -1,10 +1,17 @@
+export global AppTheme {
+    in property <color> background;
+    in property <color> text;
+}
+
 export component MainWindow inherits Window {
-    width: 64px;
-    height: 64px;
-    background: #3960D5;
-    
-    Text {
-        text: "hello world";
-        color: green;
+    Rectangle {
+        background: AppTheme.background;
+
+        Text {
+            text: "Theme test";
+            color: AppTheme.text;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
     }
 }
