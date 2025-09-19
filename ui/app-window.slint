@@ -1,17 +1,71 @@
+import { Palette, HorizontalBox, VerticalBox, GridBox, Button } from "std-widgets.slint";
+
 export global AppTheme {
     in property <color> background;
     in property <color> text;
 }
 
 export component MainWindow inherits Window {
-    Rectangle {
-        background: AppTheme.background;
+    //min-width: 300px;
+    //min-height: 400px;
+
+    VerticalBox {
+        padding: 10px;
+
+        HorizontalBox {
+            padding: 0;
+            Rectangle {}
+            Button {
+                text: "Settings";
+                max-height: 5px;
+                max-width: 15px;
+            }
+
+        }
+
+            
+        Text {
+            text: "12+14";
+            font-size: 30pt;
+            vertical-alignment: top;
+            horizontal-alignment: right;
+        }
 
         Text {
-            text: "Theme test";
-            color: AppTheme.text;
-            horizontal-alignment: center;
-            vertical-alignment: center;
+            text: "26"; 
+            font-size: 15pt;
+            vertical-alignment: top;
+            horizontal-alignment: right;
+        }
+
+        GridLayout {
+            spacing: 5px;
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {row: 1; text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {row: 2; text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {row: 3; text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {row: 4; text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {row: 5; text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+            Button {text: "1";}
+
         }
     }
+
 }

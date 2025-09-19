@@ -26,8 +26,8 @@ fn main() -> Result<(), slint::PlatformError> {
 
     match theme {
         "dark" => {
-            app_theme.set_background(slint::Color::from_rgb_u8(30, 30, 30));
-            app_theme.set_text(slint::Color::from_rgb_u8(220, 220, 220));
+            app_theme.set_background(slint::Color::from_rgb_u8(38, 38, 38));
+            app_theme.set_text(slint::Color::from_rgb_u8(235, 235, 235));
         }
         "light" => {
             app_theme.set_background(slint::Color::from_rgb_u8(255, 255, 255));
