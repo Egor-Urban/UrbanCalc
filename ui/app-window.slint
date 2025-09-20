@@ -6,20 +6,19 @@ export global AppTheme {
 }
 
 export component MainWindow inherits Window {
-    //min-width: 300px;
-    //min-height: 400px;
+    min-width: 300px;
+    min-height: 500px;
 
     VerticalBox {
         padding: 10px;
 
         HorizontalBox {
             padding: 0;
-            Rectangle {}
             Button {
                 text: "Settings";
-                max-height: 5px;
-                max-width: 15px;
+
             }
+            Rectangle {}
 
         }
 
@@ -40,6 +39,7 @@ export component MainWindow inherits Window {
 
         GridLayout {
             spacing: 5px;
+            vertical-stretch: 1;
             Button {text: "1";}
             Button {text: "1";}
             Button {text: "1";}
