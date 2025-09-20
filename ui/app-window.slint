@@ -9,6 +9,17 @@ export component MainWindow inherits Window {
     min-width: 300px;
     min-height: 500px;
 
+
+    in property <image> backspace: @image-url("icons/backspace.svg");
+    in property <image> divide: @image-url("icons/divide.svg");
+    in property <image> clear: @image-url("icons/clear.svg");
+    in property <image> multiple: @image-url("icons/multiple.svg");
+    in property <image> minus: @image-url("icons/minus.svg");
+    in property <image> plus: @image-url("icons/plus.svg");
+    in property <image> equal: @image-url("icons/equal.svg");
+    in property <image> dot: @image-url("icons/dot.svg");
+    in property <image> nul: @image-url("icons/null.svg");
+
     VerticalBox {
         padding: 10px;
 
@@ -40,30 +51,26 @@ export component MainWindow inherits Window {
         GridLayout {
             spacing: 5px;
             vertical-stretch: 1;
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {row: 1; text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {row: 2; text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
+            Button {text: "(";}
+            Button {text: ")";}
+            Button {icon: backspace;}
+            Button {icon: divide;}
+            Button {row: 1; text: "7";}
+            Button {text: "8";}
+            Button {text: "9";}
+            Button {icon: multiple;}
+            Button {row: 2; text: "4";}
+            Button {text: "5";}
+            Button {text: "6";}
+            Button {icon: minus;}
             Button {row: 3; text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {row: 4; text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {row: 5; text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
-            Button {text: "1";}
+            Button {text: "2";}
+            Button {text: "3";}
+            Button {icon: plus;}
+            Button {row: 4; icon: clear;}
+            Button {icon: nul;}
+            Button {icon: dot;}
+            Button {icon: equal;}
 
         }
     }
