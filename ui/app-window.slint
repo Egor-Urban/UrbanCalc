@@ -5,8 +5,44 @@ export global AppTheme {
     in property <color> text;
 }
 
+
+component CalcButton inherits Rectangle {
+    in-out property <string> text <=> txt.text;
+    in-out property <image> icon <=> icon.source;
+    in-out property <bool> compact: false;
+    in-out property <color> button-color: #456;
+    in-out property <color> hover-color: #6c616c;
+    in-out property <color> pressed-color: #6b8282;
+    callback clicked <=> touch.clicked;
+    
+    horizontal-stretch: compact ? 0 : 1;
+    vertical-stretch: compact ? 0 : 1;
+    min-width: txt.preferred-width + 16px;
+    min-height: txt.preferred-height + 12px;
+    preferred-width: txt.preferred-width + 16px;
+    preferred-height: txt.preferred-height + 12px;
+    border-radius: root.height / 2;
+    border-width: 1px;
+    border-color: root.background.darker(25%);
+    background: touch.pressed ? pressed-color : touch.has-hover ? hover-color : button-color;
+    
+    txt := Text {
+        x: (parent.width - self.preferred-width)/2; 
+        y: (parent.height - self.preferred-height)/2; 
+        color: touch.pressed ? #fff : #eee;
+    }
+    
+    icon := Image {
+        x: (parent.width - self.width)/2; 
+        y: (parent.height - self.height)/2; 
+    }
+    
+    touch := TouchArea { }
+}
+
+
 export component MainWindow inherits Window {
-    min-width: 300px;
+    min-width: 325px;
     min-height: 500px;
 
 
@@ -25,9 +61,9 @@ export component MainWindow inherits Window {
 
         HorizontalBox {
             padding: 0;
-            Button {
+            CalcButton {
                 text: "Settings";
-
+                compact: true;
             }
             Rectangle {}
 
@@ -36,6 +72,7 @@ export component MainWindow inherits Window {
             
         Text {
             text: "12+14";
+            font-weight: 500;
             font-size: 30pt;
             vertical-alignment: top;
             horizontal-alignment: right;
@@ -43,6 +80,7 @@ export component MainWindow inherits Window {
 
         Text {
             text: "26"; 
+            font-weight: 500;
             font-size: 15pt;
             vertical-alignment: top;
             horizontal-alignment: right;
@@ -51,26 +89,26 @@ export component MainWindow inherits Window {
         GridLayout {
             spacing: 5px;
             vertical-stretch: 1;
-            Button {text: "(";}
-            Button {text: ")";}
-            Button {icon: backspace;}
-            Button {icon: divide;}
-            Button {row: 1; text: "7";}
-            Button {text: "8";}
-            Button {text: "9";}
-            Button {icon: multiple;}
-            Button {row: 2; text: "4";}
-            Button {text: "5";}
-            Button {text: "6";}
-            Button {icon: minus;}
-            Button {row: 3; text: "1";}
-            Button {text: "2";}
-            Button {text: "3";}
-            Button {icon: plus;}
-            Button {row: 4; icon: clear;}
-            Button {icon: nul;}
-            Button {icon: dot;}
-            Button {icon: equal;}
+            CalcButton {text: "(";}
+            CalcButton {text: ")";}
+            CalcButton {icon: backspace;}
+            CalcButton {icon: divide;}
+            CalcButton {row: 1; text: "7";}
+            CalcButton {text: "8";}
+            CalcButton {text: "9";}
+            CalcButton {icon: multiple;}
+            CalcButton {row: 2; text: "4";}
+            CalcButton {text: "5";}
+            CalcButton {text: "6";}
+            CalcButton {icon: minus;}
+            CalcButton {row: 3; text: "1";}
+            CalcButton {text: "2";}
+            CalcButton {text: "3";}
+            CalcButton {icon: plus;}
+            CalcButton {row: 4; icon: clear;}
+            CalcButton {icon: nul;}
+            CalcButton {icon: dot;}
+            CalcButton {icon: equal;}
 
         }
     }

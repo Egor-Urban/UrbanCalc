@@ -11,6 +11,8 @@ use crate::utils::logger::LOGGER;
 
 
 
+
+
 fn main() -> Result<(), slint::PlatformError> {
     LOGGER.info("App started");
 
