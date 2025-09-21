@@ -1,10 +1,20 @@
-import { Palette, HorizontalBox, VerticalBox, GridBox, Button } from "std-widgets.slint";
+import { Palette, HorizontalBox, VerticalBox, GridBox, Button, LineEdit } from "std-widgets.slint";
 
 export global AppTheme {
     in property <color> background;
     in property <color> text;
 }
 
+
+export enum ButtonType {
+    number,
+    operator,
+    function,
+    parenthesis,
+    decimal,
+    clear,
+    equals
+}
 
 component CalcButton inherits Rectangle {
     in-out property <string> text <=> txt.text;
@@ -16,8 +26,10 @@ component CalcButton inherits Rectangle {
     in-out property <length> font_size: 15pt;
     in-out property <length> borders_radius: 15px;
     in-out property <color> text-color: white;
+    in-out property <ButtonType> button-type: ButtonType.number;
+    in-out property <string> button-id: "";
 
-    callback clicked <=> touch.clicked;
+    callback clicked(ButtonType, string);
     
     horizontal-stretch: compact ? 0 : 1;
     vertical-stretch: compact ? 0 : 1;
@@ -25,7 +37,7 @@ component CalcButton inherits Rectangle {
     min-height: max(txt.preferred-width, icon.width) + 12px;
     preferred-width: max(txt.preferred-width, icon.width) + 16px;
     preferred-height: max(txt.preferred-width, icon.width) + 12px;
-    border-radius: borders_radius;//root.height / 2;
+    border-radius: borders_radius;
     border-width: 1px;
     border-color: root.background.darker(25%);
     background: touch.pressed ? pressed-color : touch.has-hover ? hover-color : button-color;
@@ -43,14 +55,16 @@ component CalcButton inherits Rectangle {
         y: (parent.height - self.height)/2; 
     }
     
-    touch := TouchArea { }
+    touch := TouchArea { 
+        clicked => {
+            root.clicked(root.button-type, root.button-id);
+        }
+    }
 }
-
 
 export component MainWindow inherits Window {
     min-width: 325px;
     min-height: 500px;
-
 
     in property <image> backspace: @image-url("icons/backspace.svg");
     in property <image> divide: @image-url("icons/divide.svg");
@@ -63,6 +77,8 @@ export component MainWindow inherits Window {
     in property <image> nul: @image-url("icons/null.svg");
     in property <image> settings: @image-url("icons/settings.svg");
 
+    callback button-pressed(ButtonType, string);
+
     VerticalBox {
         padding: 10px;
 
@@ -73,12 +89,13 @@ export component MainWindow inherits Window {
                 compact: true;
                 font_size: 12pt;
                 borders_radius: 10px;
+                button-type: ButtonType.function;
+                button-id: "settings";
+                clicked(type, id) => { root.button-pressed(type, id); }
             }
             Rectangle {horizontal-stretch: 1;}
-
         }
 
-            
         Text {
             text: "12+14";
             font-weight: 500;
@@ -98,28 +115,150 @@ export component MainWindow inherits Window {
         GridLayout {
             spacing: 5px;
             vertical-stretch: 1;
-            CalcButton {text: "(";}
-            CalcButton {text: ")";}
-            CalcButton {icon: backspace;}
-            CalcButton {icon: divide; button-color: #9D9065; hover-color: #766E56; pressed-color: #665621;}
-            CalcButton {row: 1; text: "7";}
-            CalcButton {text: "8";}
-            CalcButton {text: "9";}
-            CalcButton {icon: multiple; button-color: #9D9065; hover-color: #766E56; pressed-color: #665621;}
-            CalcButton {row: 2; text: "4";}
-            CalcButton {text: "5";}
-            CalcButton {text: "6";}
-            CalcButton {icon: minus; button-color: #9D9065; hover-color: #766E56; pressed-color: #665621;}
-            CalcButton {row: 3; text: "1";}
-            CalcButton {text: "2";}
-            CalcButton {text: "3";}
-            CalcButton {icon: plus; button-color: #9D9065; hover-color: #766E56; pressed-color: #665621;}
-            CalcButton {row: 4; icon: clear;}
-            CalcButton {text: "0";}
-            CalcButton {icon: dot;}
-            CalcButton {icon: equal; button-color: #4E4C6E; hover-color: #403F52; pressed-color: #1B1947;}
-
+            
+            CalcButton {
+                text: "(";
+                button-type: ButtonType.parenthesis;
+                button-id: "open-paren";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                text: ")";
+                button-type: ButtonType.parenthesis;
+                button-id: "close-paren";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                icon: backspace;
+                button-type: ButtonType.function;
+                button-id: "backspace";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                icon: divide;
+                button-color: #9D9065;
+                hover-color: #766E56;
+                pressed-color: #665621;
+                button-type: ButtonType.operator;
+                button-id: "divide";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            
+            CalcButton {
+                row: 1;
+                text: "7";
+                button-type: ButtonType.number;
+                button-id: "7";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                text: "8";
+                button-type: ButtonType.number;
+                button-id: "8";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                text: "9";
+                button-type: ButtonType.number;
+                button-id: "9";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                icon: multiple;
+                button-color: #9D9065;
+                hover-color: #766E56;
+                pressed-color: #665621;
+                button-type: ButtonType.operator;
+                button-id: "multiply";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            
+            CalcButton {
+                row: 2;
+                text: "4";
+                button-type: ButtonType.number;
+                button-id: "4";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                text: "5";
+                button-type: ButtonType.number;
+                button-id: "5";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                text: "6";
+                button-type: ButtonType.number;
+                button-id: "6";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                icon: minus;
+                button-color: #9D9065;
+                hover-color: #766E56;
+                pressed-color: #665621;
+                button-type: ButtonType.operator;
+                button-id: "minus";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            
+            CalcButton {
+                row: 3;
+                text: "1";
+                button-type: ButtonType.number;
+                button-id: "1";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                text: "2";
+                button-type: ButtonType.number;
+                button-id: "2";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                text: "3";
+                button-type: ButtonType.number;
+                button-id: "3";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                icon: plus;
+                button-color: #9D9065;
+                hover-color: #766E56;
+                pressed-color: #665621;
+                button-type: ButtonType.operator;
+                button-id: "plus";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            
+            CalcButton {
+                row: 4;
+                icon: clear;
+                button-type: ButtonType.clear;
+                button-id: "clear";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                text: "0";
+                button-type: ButtonType.number;
+                button-id: "0";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                icon: dot;
+                button-type: ButtonType.decimal;
+                button-id: "decimal";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            CalcButton {
+                icon: equal;
+                button-color: #4E4C6E;
+                hover-color: #403F52;
+                pressed-color: #1B1947;
+                button-type: ButtonType.equals;
+                button-id: "equals";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
         }
     }
-
 }
