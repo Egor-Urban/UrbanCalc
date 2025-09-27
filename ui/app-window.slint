@@ -63,7 +63,7 @@ component CalcButton inherits Rectangle {
 export component MainWindow inherits Window {
     min-width: 325px;
     min-height: 500px;
-    title: "UrbanCalc";
+    title: "Calculator";
     in property <image> backspace: @image-url("icons/backspace.svg");
     in property <image> divide: @image-url("icons/divide.svg");
     in property <image> clear: @image-url("icons/clear.svg");
@@ -82,9 +82,66 @@ export component MainWindow inherits Window {
     background: AppTheme.background;
 
     VerticalBox {
+        // Settings
+        HorizontalBox {
+            padding: 0;
+            spacing: 5px;
+            
+            CalcButton {
+                icon: settings;
+                compact: true;
+                font_size: 12pt;
+                borders_radius: 10px;
+                button-color: #666;
+                hover-color: #777;
+                pressed-color: #555;
+                button-type: ButtonType.function;
+                button-id: "settings";
+                clicked(type, id) => { root.button-pressed(type, id); }
+            }
+            Rectangle { horizontal-stretch: 1; }
+        }
+        Rectangle {
+            height: 120px;
+            background: AppTheme.background.darker(10%);
+            border-radius: 10px;
+            border-width: 2px;
+            border-color: AppTheme.background.darker(30%);
+            
+            VerticalBox {
+                padding: 15px;
+                spacing: 5px;
+                
+                // Primer display
+                Text {
+                    text: root.expression_text;
+                    font-weight: 400;
+                    font-size: 16pt;
+                    color: AppTheme.text.transparentize(30%);
+                    vertical-alignment: top;
+                    horizontal-alignment: right;
+                    height: 25px;
+                    overflow: elide;
+                }
+                
+                // Main display
+                Text {
+                    text: root.result_text;
+                    font-weight: 600;
+                    font-size: 36pt;
+                    color: AppTheme.text;
+                    vertical-alignment: center;
+                    horizontal-alignment: right;
+                    overflow: elide;
+                }
+            }
+        }
+
         keyboard_handler := LineEdit {
-            max-height: 0;
-            max-width: 0;
+            max-height: 1px;
+            max-width: 1px;
+            min-height: 1px;
+            min-width: 1px;
             opacity: 0;
             
             init => {
@@ -124,62 +181,10 @@ export component MainWindow inherits Window {
 
         }
         padding: 10px;
-        // Settings
-        HorizontalBox {
-            padding: 0;
-            spacing: 5px;
-            
-            CalcButton {
-                icon: settings;
-                compact: true;
-                font_size: 12pt;
-                borders_radius: 10px;
-                button-color: #666;
-                hover-color: #777;
-                pressed-color: #555;
-                button-type: ButtonType.function;
-                button-id: "settings";
-                clicked(type, id) => { root.button-pressed(type, id); }
-            }
-            Rectangle { horizontal-stretch: 1; }
-        }
+
 
         // Calc display
-        Rectangle {
-            height: 120px;
-            background: AppTheme.background.darker(10%);
-            border-radius: 10px;
-            border-width: 2px;
-            border-color: AppTheme.background.darker(30%);
-            
-            VerticalBox {
-                padding: 15px;
-                spacing: 5px;
-                
-                // Primer display
-                Text {
-                    text: root.expression_text;
-                    font-weight: 400;
-                    font-size: 16pt;
-                    color: AppTheme.text.transparentize(30%);
-                    vertical-alignment: top;
-                    horizontal-alignment: right;
-                    height: 25px;
-                    overflow: elide;
-                }
-                
-                // Main display
-                Text {
-                    text: root.result_text;
-                    font-weight: 600;
-                    font-size: 36pt;
-                    color: AppTheme.text;
-                    vertical-alignment: center;
-                    horizontal-alignment: right;
-                    overflow: elide;
-                }
-            }
-        }
+
 
         // Btns
         GridLayout {
