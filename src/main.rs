@@ -39,7 +39,7 @@ fn main() -> Result<(), slint::PlatformError> {
         _ => {}
     }
     
-    
+
     // calc init
     let mut calculator = Calculator::new();
     main_window.set_expression_text(slint::SharedString::from(""));

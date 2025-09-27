@@ -29,7 +29,6 @@ component CalcButton inherits Rectangle {
     in-out property <string> button-id: "";
 
     callback clicked(ButtonType, string);
-    
     horizontal-stretch: compact ? 0 : 1;
     vertical-stretch: compact ? 0 : 1;
     min-width: max(txt.preferred-width, icon.width) + 16px;
@@ -43,14 +42,14 @@ component CalcButton inherits Rectangle {
     
     txt := Text {
         x: (parent.width - self.preferred-width)/2; 
-        y: (parent.height - self.preferred-height)/2; 
+        y: (parent.height - self.preferred-height)/2;
         color: text-color;
         font-size: font_size;
         font-weight: 500;
     }
     
     icon := Image {
-        x: (parent.width - self.width)/2; 
+        x: (parent.width - self.width)/2;
         y: (parent.height - self.height)/2; 
     }
     
@@ -65,7 +64,6 @@ export component MainWindow inherits Window {
     min-width: 325px;
     min-height: 500px;
     title: "UrbanCalc";
-
     in property <image> backspace: @image-url("icons/backspace.svg");
     in property <image> divide: @image-url("icons/divide.svg");
     in property <image> clear: @image-url("icons/clear.svg");
@@ -78,14 +76,39 @@ export component MainWindow inherits Window {
     in property <image> settings: @image-url("icons/settings.svg");
     in-out property <string> expression_text: "";
     in-out property <string> result_text: "0";
-    
     callback button-pressed(ButtonType, string);
+
 
     background: AppTheme.background;
 
     VerticalBox {
-        padding: 10px;
+        LineEdit {
+            max-height: 0;
+            max-width: 0;
+            key-pressed(event) => {
+                if (event.text >= "0" && event.text <= "9") {
+                    root.button-pressed(ButtonType.number, event.text);
+                } else if (event.text == "+") {
+                    root.button-pressed(ButtonType.operator, "plus");
+                } else if (event.text == "-") {
+                    root.button-pressed(ButtonType.operator, "minus");
+                } else if (event.text == "*") {
+                    root.button-pressed(ButtonType.operator, "multiply");
+                } else if (event.text == "/") {
+                    root.button-pressed(ButtonType.operator, "divide");
+                } else if (event.text == "." || event.text == ",") {
+                    root.button-pressed(ButtonType.decimal, "decimal");
+                } else if (event.text == "(") {
+                    root.button-pressed(ButtonType.parenthesis, "open-paren");
+                } else if (event.text == ")") {
+                    root.button-pressed(ButtonType.parenthesis, "close-paren");
 
+                }
+                accept
+            }
+
+        }
+        padding: 10px;
         // Settings
         HorizontalBox {
             padding: 0;
@@ -154,6 +177,7 @@ export component MainWindow inherits Window {
                 button-color: #666;
                 hover-color: #777;
                 pressed-color: #555;
+           
                 button-type: ButtonType.parenthesis;
                 button-id: "open-paren";
                 clicked(type, id) => { root.button-pressed(type, id); }
@@ -165,7 +189,8 @@ export component MainWindow inherits Window {
                 pressed-color: #555;
                 button-type: ButtonType.parenthesis;
                 button-id: "close-paren";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 icon: backspace;
@@ -174,7 +199,8 @@ export component MainWindow inherits Window {
                 pressed-color: #b92c28;
                 button-type: ButtonType.function;
                 button-id: "backspace";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 icon: divide;
@@ -183,7 +209,8 @@ export component MainWindow inherits Window {
                 pressed-color: #d58512;
                 button-type: ButtonType.operator;
                 button-id: "divide";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             
             // 2th line: 7 8 9 ×
@@ -195,7 +222,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "7";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 text: "8";
@@ -204,7 +232,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "8";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 text: "9";
@@ -213,7 +242,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "9";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 icon: multiple;
@@ -222,7 +252,8 @@ export component MainWindow inherits Window {
                 pressed-color: #d58512;
                 button-type: ButtonType.operator;
                 button-id: "multiply";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             
             // 3th line: 4 5 6 -
@@ -234,7 +265,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "4";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 text: "5";
@@ -243,7 +275,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "5";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 text: "6";
@@ -252,7 +285,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "6";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 icon: minus;
@@ -261,7 +295,8 @@ export component MainWindow inherits Window {
                 pressed-color: #d58512;
                 button-type: ButtonType.operator;
                 button-id: "minus";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             
             // 4th line: 1 2 3 +
@@ -273,7 +308,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "1";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 text: "2";
@@ -282,7 +318,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "2";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 text: "3";
@@ -291,7 +328,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "3";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 icon: plus;
@@ -300,7 +338,8 @@ export component MainWindow inherits Window {
                 pressed-color: #d58512;
                 button-type: ButtonType.operator;
                 button-id: "plus";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             
             // 5th line: C 0 . =
@@ -312,7 +351,8 @@ export component MainWindow inherits Window {
                 pressed-color: #b92c28;
                 button-type: ButtonType.clear;
                 button-id: "clear";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 text: "0";
@@ -321,7 +361,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "0";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 icon: dot;
@@ -330,7 +371,8 @@ export component MainWindow inherits Window {
                 pressed-color: #4a4a4a;
                 button-type: ButtonType.decimal;
                 button-id: "decimal";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
             CalcButton {
                 icon: equal;
@@ -339,7 +381,8 @@ export component MainWindow inherits Window {
                 pressed-color: #398439;
                 button-type: ButtonType.equals;
                 button-id: "equals";
-                clicked(type, id) => { root.button-pressed(type, id); }
+                clicked(type, id) => { root.button-pressed(type, id);
+                }
             }
         }
     }
