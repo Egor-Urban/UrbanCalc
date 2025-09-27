@@ -1,131 +1,382 @@
 slint::include_modules!();
 
+
 mod utils {
     pub mod system_utils;
     pub mod logger;
 }
 
+
 use crate::utils::logger::LOGGER;
 
+
+
 struct Calculator {
-    display: String,
-    current_input: String,
-    last_operator: String,
-    result: f64,
-    should_reset: bool,
+    expression: String,
+    result: String,
+    last_result: f64,
+    should_reset_expression: bool,
+    parentheses_count: i32,
 }
+
+
 
 impl Calculator {
     fn new() -> Self {
         Self {
-            display: String::from("0"),
-            current_input: String::new(),
-            last_operator: String::new(),
-            result: 0.0,
-            should_reset: false,
+            expression: String::new(),
+            result: String::from("0"),
+            last_result: 0.0,
+            should_reset_expression: false,
+            parentheses_count: 0,
         }
     }
+
 
     fn add_digit(&mut self, digit: &str) {
-        if self.should_reset {
-            self.current_input.clear();
-            self.should_reset = false;
+        if self.should_reset_expression {
+            self.expression.clear();
+            self.should_reset_expression = false;
         }
         
-        if self.current_input == "0" && digit != "." {
-            self.current_input = digit.to_string();
-        } else {
-            self.current_input.push_str(digit);
-        }
-        
-        self.display = self.current_input.clone();
+        self.expression.push_str(digit);
+        self.update_result();
     }
+
 
     fn add_decimal(&mut self) {
-        if self.should_reset {
-            self.current_input = "0".to_string();
-            self.should_reset = false;
+        if self.should_reset_expression {
+            self.expression.clear();
+            self.should_reset_expression = false;
         }
         
-        if !self.current_input.contains('.') {
-            if self.current_input.is_empty() {
-                self.current_input = "0.".to_string();
-            } else {
-                self.current_input.push('.');
+        // Check dot
+        let mut can_add_decimal = true;
+        let mut i = self.expression.len();
+        
+        while i > 0 {
+            i -= 1;
+            let ch = self.expression.chars().nth(i).unwrap();
+            if ch == '.' {
+                can_add_decimal = false;
+                break;
+            }
+            if !ch.is_ascii_digit() {
+                break;
             }
         }
         
-        self.display = self.current_input.clone();
+        if can_add_decimal {
+            if self.expression.is_empty() || 
+               self.expression.chars().last().map_or(false, |c| "+-×÷(".contains(c)) {
+                self.expression.push_str("0.");
+            } else {
+                self.expression.push('.');
+            }
+            self.update_result();
+        }
     }
+
 
     fn add_operator(&mut self, operator: &str) {
-        if !self.current_input.is_empty() {
-            if let Ok(value) = self.current_input.parse::<f64>() {
-                if !self.last_operator.is_empty() {
-                    self.calculate();
-                } else {
-                    self.result = value;
+        if self.should_reset_expression {
+            self.expression = self.result.clone();
+            self.should_reset_expression = false;
+        }
+        
+        if !self.expression.is_empty() {
+            let last_char = self.expression.chars().last().unwrap();
+            
+            if "+-×÷".contains(last_char) {
+                self.expression.pop();
+            }
+            
+            let op_symbol = match operator {
+                "plus" => "+",
+                "minus" => "-",
+                "multiply" => "×",
+                "divide" => "÷",
+                _ => return,
+            };
+            
+            self.expression.push_str(op_symbol);
+        } else if operator == "minus" {
+            self.expression.push('-');
+        }
+    }
+
+
+    fn add_parenthesis(&mut self, paren_type: &str) {
+        if self.should_reset_expression {
+            self.expression.clear();
+            self.should_reset_expression = false;
+        }
+        
+        match paren_type {
+            "open-paren" => {
+                if self.expression.is_empty() || 
+                   self.expression.chars().last().map_or(false, |c| "+-×÷(".contains(c)) {
+                    self.expression.push('(');
+                    self.parentheses_count += 1;
                 }
+            },
+            "close-paren" => {
+                if self.parentheses_count > 0 &&
+                   self.expression.chars().last().map_or(false, |c| c.is_ascii_digit() || c == '.' || c == ')') {
+                    self.expression.push(')');
+                    self.parentheses_count -= 1;
+                }
+            },
+            _ => {}
+        }
+        
+        self.update_result();
+    }
+
+
+    fn calculate(&mut self) {
+        if !self.expression.is_empty() {
+            match self.evaluate_expression(&self.expression) {
+                Ok(result) => {
+                    self.last_result = result;
+                    self.result = format_number(result);
+                    self.should_reset_expression = true;
+                },
+                Err(_) => {
+                    self.result = "Error".to_string();
+                    self.should_reset_expression = true;
+                }
+            }
+        }
+    }
+
+
+    fn backspace(&mut self) {
+        if !self.expression.is_empty() {
+            let last_char = self.expression.chars().last().unwrap();
+            if last_char == '(' {
+                self.parentheses_count -= 1;
+            } else if last_char == ')' {
+                self.parentheses_count += 1;
+            }
+            self.expression.pop();
+            self.update_result();
+        }
+    }
+
+
+    fn clear(&mut self) {
+        self.expression.clear();
+        self.result = "0".to_string();
+        self.last_result = 0.0;
+        self.should_reset_expression = false;
+        self.parentheses_count = 0;
+    }
+
+
+    fn update_result(&mut self) {
+        if self.expression.is_empty() {
+            self.result = "0".to_string();
+            return;
+        }
+
+        match self.evaluate_expression(&self.expression) {
+            Ok(result) => {
+                self.result = format_number(result);
+            },
+            Err(_) => {
+                self.result = "0".to_string();
+            }
+        }
+    }
+
+
+    fn evaluate_expression(&self, expr: &str) -> Result<f64, String> {
+        if expr.is_empty() {
+            return Ok(0.0);
+        }
+        
+        let last_char = expr.chars().last().unwrap();
+        if "+-×÷(".contains(last_char) {
+            return Err("Incomplete expression".to_string());
+        }
+        
+        let normalized = expr
+            .replace('×', "*")
+            .replace('÷', "/");
+        
+        self.parse_expression(&normalized)
+    }
+    
+
+    fn parse_expression(&self, expr: &str) -> Result<f64, String> {
+        let expr = expr.replace(' ', "");
+        
+        self.evaluate_string(&expr)
+    }
+    
+
+    fn evaluate_string(&self, expr: &str) -> Result<f64, String> {
+        if expr.is_empty() {
+            return Ok(0.0);
+        }
+        
+        let mut parser = ExpressionParser::new(expr);
+        parser.parse()
+    }
+
+
+    fn get_expression(&self) -> String {
+        self.expression.clone()
+    }
+
+
+    fn get_result(&self) -> String {
+        self.result.clone()
+    }
+}
+
+
+
+struct ExpressionParser {
+    input: Vec<char>,
+    pos: usize,
+}
+
+
+
+impl ExpressionParser {
+    fn new(input: &str) -> Self {
+        Self {
+            input: input.chars().collect(),
+            pos: 0,
+        }
+    }
+    
+
+    fn parse(&mut self) -> Result<f64, String> {
+        let result = self.parse_expression()?;
+        if self.pos < self.input.len() {
+            return Err("Unexpected character".to_string());
+        }
+        Ok(result)
+    }
+    
+
+    fn parse_expression(&mut self) -> Result<f64, String> {
+        let mut result = self.parse_term()?;
+        
+        while self.pos < self.input.len() {
+            match self.current_char() {
+                '+' => {
+                    self.pos += 1;
+                    result += self.parse_term()?;
+                },
+                '-' => {
+                    self.pos += 1;
+                    result -= self.parse_term()?;
+                },
+                _ => break,
             }
         }
         
-        self.last_operator = operator.to_string();
-        self.should_reset = true;
+        Ok(result)
     }
+    
 
-    fn calculate(&mut self) {
-        if !self.current_input.is_empty() && !self.last_operator.is_empty() {
-            if let Ok(value) = self.current_input.parse::<f64>() {
-                match self.last_operator.as_str() {
-                    "plus" => self.result += value,
-                    "minus" => self.result -= value,
-                    "multiply" => self.result *= value,
-                    "divide" => {
-                        if value != 0.0 {
-                            self.result /= value;
-                        } else {
-                            self.display = "Error".to_string();
-                            self.clear();
-                            return;
-                        }
-                    },
-                    _ => {}
+    fn parse_term(&mut self) -> Result<f64, String> {
+        let mut result = self.parse_factor()?;
+        
+        while self.pos < self.input.len() {
+            match self.current_char() {
+                '*' => {
+                    self.pos += 1;
+                    result *= self.parse_factor()?;
+                },
+                '/' => {
+                    self.pos += 1;
+                    let divisor = self.parse_factor()?;
+                    if divisor == 0.0 {
+                        return Err("Division by zero".to_string());
+                    }
+                    result /= divisor;
+                },
+                _ => break,
+            }
+        }
+        
+        Ok(result)
+    }
+    
+
+    fn parse_factor(&mut self) -> Result<f64, String> {
+        self.skip_whitespace();
+        
+        if self.pos >= self.input.len() {
+            return Err("Unexpected end of expression".to_string());
+        }
+        
+        match self.current_char() {
+            '(' => {
+                self.pos += 1;
+                let result = self.parse_expression()?;
+                if self.pos >= self.input.len() || self.current_char() != ')' {
+                    return Err("Missing closing parenthesis".to_string());
                 }
-                
-                self.display = format_number(self.result);
-                self.current_input = self.display.clone();
-                self.last_operator.clear();
-                self.should_reset = true;
-            }
+                self.pos += 1;
+                Ok(result)
+            },
+            '-' => {
+                self.pos += 1;
+                Ok(-self.parse_factor()?)
+            },
+            '+' => {
+                self.pos += 1;
+                self.parse_factor()
+            },
+            _ => self.parse_number(),
         }
     }
+    
 
-    fn backspace(&mut self) {
-        if !self.current_input.is_empty() {
-            self.current_input.pop();
-            if self.current_input.is_empty() {
-                self.current_input = "0".to_string();
+    fn parse_number(&mut self) -> Result<f64, String> {
+        let start = self.pos;
+        
+        while self.pos < self.input.len() {
+            let ch = self.current_char();
+            if ch.is_ascii_digit() || ch == '.' {
+                self.pos += 1;
+            } else {
+                break;
             }
-            self.display = self.current_input.clone();
         }
+        
+        if start == self.pos {
+            return Err("Expected number".to_string());
+        }
+        
+        let number_str: String = self.input[start..self.pos].iter().collect();
+        number_str.parse::<f64>().map_err(|_| "Invalid number".to_string())
     }
+    
 
-    fn clear(&mut self) {
-        self.display = "0".to_string();
-        self.current_input.clear();
-        self.last_operator.clear();
-        self.result = 0.0;
-        self.should_reset = false;
-    }
-
-    fn get_display(&self) -> String {
-        if self.display.is_empty() {
-            "0".to_string()
+    fn current_char(&self) -> char {
+        if self.pos < self.input.len() {
+            self.input[self.pos]
         } else {
-            self.display.clone()
+            '\0'
+        }
+    }
+    
+
+    fn skip_whitespace(&mut self) {
+        while self.pos < self.input.len() && self.current_char().is_whitespace() {
+            self.pos += 1;
         }
     }
 }
+
+
 
 fn format_number(num: f64) -> String {
     if num.fract() == 0.0 && num.abs() < 1e15 {
@@ -140,39 +391,7 @@ fn format_number(num: f64) -> String {
     }
 }
 
-fn handle_keyboard_input(key: &str, main_window: &MainWindow, calculator: &mut Calculator) {
-    let (button_type, button_id) = match key {
-        "0" => ("NUMBER", "0"),
-        "1" => ("NUMBER", "1"),
-        "2" => ("NUMBER", "2"),
-        "3" => ("NUMBER", "3"),
-        "4" => ("NUMBER", "4"),
-        "5" => ("NUMBER", "5"),
-        "6" => ("NUMBER", "6"),
-        "7" => ("NUMBER", "7"),
-        "8" => ("NUMBER", "8"),
-        "9" => ("NUMBER", "9"),
-        
-        "+" => ("OPERATOR", "plus"),
-        "-" => ("OPERATOR", "minus"),
-        "*" => ("OPERATOR", "multiply"),
-        "/" => ("OPERATOR", "divide"),
-        
-        "=" | "Enter" => ("EQUALS", "equals"),
-        "." | "," => ("DECIMAL", "decimal"),
-        "(" => ("PARENTHESIS", "open-paren"),
-        ")" => ("PARENTHESIS", "close-paren"),
-        "Backspace" => ("FUNCTION", "backspace"),
-        "Delete" | "c" | "C" => ("CLEAR", "clear"),
-        "Escape" => ("FUNCTION", "settings"),
-        
-        _ => return, 
-    };
-    
-    handle_calculator_input(button_id, calculator, main_window);
-    
-    LOGGER.info(&format!("Keyboard input: {} -> Type: {}, ID: {}", key, button_type, button_id));
-}
+
 
 fn handle_calculator_input(button_id: &str, calculator: &mut Calculator, main_window: &MainWindow) {
     match button_id {
@@ -184,6 +403,9 @@ fn handle_calculator_input(button_id: &str, calculator: &mut Calculator, main_wi
         },
         "plus" | "minus" | "multiply" | "divide" => {
             calculator.add_operator(button_id);
+        },
+        "open-paren" | "close-paren" => {
+            calculator.add_parenthesis(button_id);
         },
         "equals" => {
             calculator.calculate();
@@ -200,8 +422,11 @@ fn handle_calculator_input(button_id: &str, calculator: &mut Calculator, main_wi
         _ => {}
     }
     
-    main_window.set_display_text(slint::SharedString::from(calculator.get_display()));
+    main_window.set_expression_text(slint::SharedString::from(calculator.get_expression()));
+    main_window.set_result_text(slint::SharedString::from(calculator.get_result()));
 }
+
+
 
 fn main() -> Result<(), slint::PlatformError> {
     LOGGER.info("App started");
@@ -227,16 +452,15 @@ fn main() -> Result<(), slint::PlatformError> {
         _ => {}
     }
     
-    // INIT
+    // calc init
     let mut calculator = Calculator::new();
-    main_window.set_display_text(slint::SharedString::from("0"));
+    main_window.set_expression_text(slint::SharedString::from(""));
+    main_window.set_result_text(slint::SharedString::from("0"));
     
     let calculator_rc = std::rc::Rc::new(std::cell::RefCell::new(calculator));
     let calculator_for_buttons = calculator_rc.clone();
-    let calculator_for_keyboard = calculator_rc.clone();
-    
-    // keypress handle
     let main_window_weak_buttons = main_window.as_weak();
+
     main_window.on_button_pressed(move |button_type, button_id| {
         let main_window = main_window_weak_buttons.upgrade().unwrap();
         let mut calc = calculator_for_buttons.borrow_mut();
@@ -255,8 +479,6 @@ fn main() -> Result<(), slint::PlatformError> {
         
         LOGGER.info(&format!("Calculator button pressed: Type: {}, ID: {}", type_str, button_id.as_str()));
     });
-    
-    //TODO Physical jeyboard handling
     
     main_window.run()
 }
