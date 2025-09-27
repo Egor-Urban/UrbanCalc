@@ -7,6 +7,7 @@ edition = "2024"
 slint = "1.13.1"
 chrono = "0.4"
 once_cell = "1.17"
+rdev = "0.5"
 
 
 [build-dependencies]
