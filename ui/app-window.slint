@@ -82,30 +82,45 @@ export component MainWindow inherits Window {
     background: AppTheme.background;
 
     VerticalBox {
-        LineEdit {
+        keyboard_handler := LineEdit {
             max-height: 0;
             max-width: 0;
-            key-pressed(event) => {
-                if (event.text >= "0" && event.text <= "9") {
-                    root.button-pressed(ButtonType.number, event.text);
-                } else if (event.text == "+") {
-                    root.button-pressed(ButtonType.operator, "plus");
-                } else if (event.text == "-") {
-                    root.button-pressed(ButtonType.operator, "minus");
-                } else if (event.text == "*") {
-                    root.button-pressed(ButtonType.operator, "multiply");
-                } else if (event.text == "/") {
-                    root.button-pressed(ButtonType.operator, "divide");
-                } else if (event.text == "." || event.text == ",") {
-                    root.button-pressed(ButtonType.decimal, "decimal");
-                } else if (event.text == "(") {
-                    root.button-pressed(ButtonType.parenthesis, "open-paren");
-                } else if (event.text == ")") {
-                    root.button-pressed(ButtonType.parenthesis, "close-paren");
-
-                }
-                accept
+            opacity: 0;
+            
+            init => {
+                self.focus();
             }
+
+            
+        key-pressed(event) => {
+            if (event.text >= "0" && event.text <= "9") {
+                root.button-pressed(ButtonType.number, event.text);
+            } else if (event.text == "+") {
+                root.button-pressed(ButtonType.operator, "plus");
+            } else if (event.text == "-") {
+                root.button-pressed(ButtonType.operator, "minus");
+            } else if (event.text == "*") {
+                root.button-pressed(ButtonType.operator, "multiply");
+            } else if (event.text == "/") {
+                root.button-pressed(ButtonType.operator, "divide");
+            } else if (event.text == "." || event.text == ",") {
+                root.button-pressed(ButtonType.decimal, "decimal");
+            } else if (event.text == "(") {
+                root.button-pressed(ButtonType.parenthesis, "open-paren");
+            } else if (event.text == ")") {
+                root.button-pressed(ButtonType.parenthesis, "close-paren");
+            } else if (event.text == "=") {
+                root.button-pressed(ButtonType.equals, "equals");
+            } else if (event.text == "\n") {   // Enter
+                root.button-pressed(ButtonType.equals, "equals");
+            } else if (event.text == Key.Backspace) {   // Backspace // IMPOSTER
+                root.button-pressed(ButtonType.function, "backspace");
+            } else if (event.text == Key.Delete) { // Delete
+                root.button-pressed(ButtonType.clear, "clear");
+            }
+            accept
+        }
+
 
         }
         padding: 10px;
