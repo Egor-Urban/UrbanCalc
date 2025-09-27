@@ -5,7 +5,6 @@ export global AppTheme {
     in property <color> text;
 }
 
-
 export enum ButtonType {
     number,
     operator,
@@ -65,6 +64,7 @@ component CalcButton inherits Rectangle {
 export component MainWindow inherits Window {
     min-width: 325px;
     min-height: 500px;
+    title: "Калькулятор";
 
     in property <image> backspace: @image-url("icons/backspace.svg");
     in property <image> divide: @image-url("icons/divide.svg");
@@ -76,69 +76,103 @@ export component MainWindow inherits Window {
     in property <image> dot: @image-url("icons/dot.svg");
     in property <image> nul: @image-url("icons/null.svg");
     in property <image> settings: @image-url("icons/settings.svg");
-
+    in-out property <string> display-text: "0";
+    
     callback button-pressed(ButtonType, string);
+
+    background: AppTheme.background;
 
     VerticalBox {
         padding: 10px;
 
         HorizontalBox {
             padding: 0;
+            spacing: 5px;
+            
             CalcButton {
                 icon: settings;
                 compact: true;
                 font_size: 12pt;
                 borders_radius: 10px;
+                button-color: #666;
+                hover-color: #777;
+                pressed-color: #555;
                 button-type: ButtonType.function;
                 button-id: "settings";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
-            Rectangle {horizontal-stretch: 1;}
+            Rectangle { horizontal-stretch: 1; }
         }
 
-        Text {
-            text: "12+14";
-            font-weight: 500;
-            font-size: 30pt;
-            vertical-alignment: top;
-            horizontal-alignment: right;
-        }
-
-        Text {
-            text: "26"; 
-            font-weight: 500;
-            font-size: 15pt;
-            vertical-alignment: top;
-            horizontal-alignment: right;
+        Rectangle {
+            height: 120px;
+            background: AppTheme.background.darker(10%);
+            border-radius: 10px;
+            border-width: 2px;
+            border-color: AppTheme.background.darker(30%);
+            
+            VerticalBox {
+                padding: 15px;
+                spacing: 5px;
+                
+                Text {
+                    text: "";
+                    font-weight: 400;
+                    font-size: 16pt;
+                    color: AppTheme.text.transparentize(30%);
+                    vertical-alignment: top;
+                    horizontal-alignment: right;
+                    height: 25px;
+                }
+                
+                Text {
+                    text: root.display-text;
+                    font-weight: 600;
+                    font-size: 36pt;
+                    color: AppTheme.text;
+                    vertical-alignment: center;
+                    horizontal-alignment: right;
+                    overflow: elide;
+                }
+            }
         }
 
         GridLayout {
-            spacing: 5px;
+            spacing: 8px;
             vertical-stretch: 1;
             
             CalcButton {
                 text: "(";
+                button-color: #666;
+                hover-color: #777;
+                pressed-color: #555;
                 button-type: ButtonType.parenthesis;
                 button-id: "open-paren";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 text: ")";
+                button-color: #666;
+                hover-color: #777;
+                pressed-color: #555;
                 button-type: ButtonType.parenthesis;
                 button-id: "close-paren";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 icon: backspace;
+                button-color: #d9534f;
+                hover-color: #c9302c;
+                pressed-color: #b92c28;
                 button-type: ButtonType.function;
                 button-id: "backspace";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 icon: divide;
-                button-color: #9D9065;
-                hover-color: #766E56;
-                pressed-color: #665621;
+                button-color: #f0ad4e;
+                hover-color: #ec971f;
+                pressed-color: #d58512;
                 button-type: ButtonType.operator;
                 button-id: "divide";
                 clicked(type, id) => { root.button-pressed(type, id); }
@@ -147,114 +181,153 @@ export component MainWindow inherits Window {
             CalcButton {
                 row: 1;
                 text: "7";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "7";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 text: "8";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "8";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 text: "9";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "9";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 icon: multiple;
-                button-color: #9D9065;
-                hover-color: #766E56;
-                pressed-color: #665621;
+                button-color: #f0ad4e;
+                hover-color: #ec971f;
+                pressed-color: #d58512;
                 button-type: ButtonType.operator;
                 button-id: "multiply";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             
+            // 3th line 4 5 6 -
             CalcButton {
                 row: 2;
                 text: "4";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "4";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 text: "5";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "5";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 text: "6";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "6";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 icon: minus;
-                button-color: #9D9065;
-                hover-color: #766E56;
-                pressed-color: #665621;
+                button-color: #f0ad4e;
+                hover-color: #ec971f;
+                pressed-color: #d58512;
                 button-type: ButtonType.operator;
                 button-id: "minus";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             
+            // 4th line 1 2 3 +
             CalcButton {
                 row: 3;
                 text: "1";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "1";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 text: "2";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "2";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 text: "3";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "3";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 icon: plus;
-                button-color: #9D9065;
-                hover-color: #766E56;
-                pressed-color: #665621;
+                button-color: #f0ad4e;
+                hover-color: #ec971f;
+                pressed-color: #d58512;
                 button-type: ButtonType.operator;
                 button-id: "plus";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             
+            // 5th line C 0 . =
             CalcButton {
                 row: 4;
                 icon: clear;
+                button-color: #d9534f;
+                hover-color: #c9302c;
+                pressed-color: #b92c28;
                 button-type: ButtonType.clear;
                 button-id: "clear";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 text: "0";
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.number;
                 button-id: "0";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 icon: dot;
+                button-color: #5a5a5a;
+                hover-color: #6a6a6a;
+                pressed-color: #4a4a4a;
                 button-type: ButtonType.decimal;
                 button-id: "decimal";
                 clicked(type, id) => { root.button-pressed(type, id); }
             }
             CalcButton {
                 icon: equal;
-                button-color: #4E4C6E;
-                hover-color: #403F52;
-                pressed-color: #1B1947;
+                button-color: #5cb85c;
+                hover-color: #449d44;
+                pressed-color: #398439;
                 button-type: ButtonType.equals;
                 button-id: "equals";
                 clicked(type, id) => { root.button-pressed(type, id); }
