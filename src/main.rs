@@ -65,7 +65,6 @@ fn main() -> Result<(), slint::PlatformError> {
         
         handle_calculator_input(button_id.as_str(), &mut calc);
         
-        // Update UI after calculation
         main_window.set_expression_text(slint::SharedString::from(calc.get_expression()));
         main_window.set_result_text(slint::SharedString::from(calc.get_result()));
         

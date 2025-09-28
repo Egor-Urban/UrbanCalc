@@ -1,8 +1,11 @@
 use crate::utils::logger::LOGGER;
 
+
 const OPERATORS: &str = "+-×÷";
 const OPEN_PAREN: char = '(';
 const CLOSE_PAREN: char = ')';
+
+
 
 pub struct Calculator {
     expression: String,
@@ -11,6 +14,8 @@ pub struct Calculator {
     should_reset_expression: bool,
     parentheses_count: i32,
 }
+
+
 
 impl Calculator {
     pub fn new() -> Self {
@@ -23,6 +28,7 @@ impl Calculator {
         }
     }
 
+
     pub fn add_digit(&mut self, digit: &str) {
         if self.should_reset_expression {
             self.expression.clear();
@@ -32,6 +38,7 @@ impl Calculator {
         self.expression.push_str(digit);
         self.update_result();
     }
+
 
     pub fn add_decimal(&mut self) {
         if self.should_reset_expression {
@@ -66,6 +73,7 @@ impl Calculator {
         }
     }
 
+
     pub fn add_operator(&mut self, operator: &str) {
         if self.should_reset_expression {
             self.expression = self.result.clone();
@@ -92,6 +100,7 @@ impl Calculator {
             self.expression.push('-');
         }
     }
+
 
     pub fn add_parenthesis(&mut self, paren_type: &str) {
         if self.should_reset_expression {
@@ -124,12 +133,13 @@ impl Calculator {
         self.update_result();
     }
 
+
     pub fn calculate(&mut self) {
         if !self.expression.is_empty() {
             match self.evaluate_expression(&self.expression) {
                 Ok(result) => {
                     if result.is_nan() || result.is_infinite() {
-                        self.result = "Error".to_string();
+                        self.result = "x64 Error".to_string();
                     } else {
                         self.last_result = result;
                         self.result = format_number(result);
@@ -144,6 +154,7 @@ impl Calculator {
         }
     }
 
+
     pub fn backspace(&mut self) {
         if !self.expression.is_empty() {
             let last_char = char::from(*self.expression.as_bytes().last().unwrap());
@@ -157,6 +168,7 @@ impl Calculator {
         }
     }
 
+
     pub fn clear(&mut self) {
         self.expression.clear();
         self.result = "0".to_string();
@@ -165,13 +177,16 @@ impl Calculator {
         self.parentheses_count = 0;
     }
 
+
     pub fn get_expression(&self) -> String {
         self.expression.clone()
     }
 
+
     pub fn get_result(&self) -> String {
         self.result.clone()
     }
+
 
     fn update_result(&mut self) {
         if self.expression.is_empty() {
@@ -193,6 +208,7 @@ impl Calculator {
         }
     }
 
+
     fn evaluate_expression(&self, expr: &str) -> Result<f64, String> {
         if expr.is_empty() {
             return Ok(0.0);
@@ -207,11 +223,13 @@ impl Calculator {
         self.parse_expression(&normalized)
     }
     
+
     fn parse_expression(&self, expr: &str) -> Result<f64, String> {
         let expr = expr.replace(' ', "");
         self.evaluate_string(&expr)
     }
     
+
     fn evaluate_string(&self, expr: &str) -> Result<f64, String> {
         if expr.is_empty() {
             return Ok(0.0);
@@ -222,10 +240,14 @@ impl Calculator {
     }
 }
 
+
+
 struct ExpressionParser<'a> {
     input: &'a [u8],
     pos: usize,
 }
+
+
 
 impl<'a> ExpressionParser<'a> {
     fn new(input: &'a str) -> Self {
@@ -235,6 +257,7 @@ impl<'a> ExpressionParser<'a> {
         }
     }
     
+
     fn parse(&mut self) -> Result<f64, String> {
         let result = self.parse_expression()?;
         if self.pos < self.input.len() {
@@ -243,6 +266,7 @@ impl<'a> ExpressionParser<'a> {
         Ok(result)
     }
     
+
     fn parse_expression(&mut self) -> Result<f64, String> {
         let mut result = self.parse_term()?;
         
@@ -263,6 +287,7 @@ impl<'a> ExpressionParser<'a> {
         Ok(result)
     }
     
+
     fn parse_term(&mut self) -> Result<f64, String> {
         let mut result = self.parse_factor()?;
         
@@ -287,6 +312,7 @@ impl<'a> ExpressionParser<'a> {
         Ok(result)
     }
     
+
     fn parse_factor(&mut self) -> Result<f64, String> {
         if self.pos >= self.input.len() {
             return Err("Unexpected end of expression".to_string());
@@ -314,6 +340,7 @@ impl<'a> ExpressionParser<'a> {
         }
     }
     
+
     fn parse_number(&mut self) -> Result<f64, String> {
         let start = self.pos;
         let is_negative = if self.pos < self.input.len() && self.current_char() == b'-' {
@@ -361,6 +388,7 @@ impl<'a> ExpressionParser<'a> {
         Ok(if is_negative { -number } else { number })
     }
     
+
     fn current_char(&self) -> u8 {
         if self.pos < self.input.len() {
             self.input[self.pos]
@@ -369,6 +397,8 @@ impl<'a> ExpressionParser<'a> {
         }
     }
 }
+
+
 
 fn format_number(num: f64) -> String {
     if num.is_nan() {
@@ -390,6 +420,8 @@ fn format_number(num: f64) -> String {
         trimmed.to_string()
     }
 }
+
+
 
 pub fn handle_calculator_input(button_id: &str, calculator: &mut Calculator) {
     match button_id {

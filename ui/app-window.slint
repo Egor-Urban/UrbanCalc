@@ -1,9 +1,11 @@
 import { Palette, HorizontalBox, VerticalBox, GridBox, Button, LineEdit, ScrollView } from "std-widgets.slint";
 
+
 export global AppTheme {
     in property <color> background;
     in property <color> text;
 }
+
 
 export enum ButtonType {
     number,
@@ -15,6 +17,8 @@ export enum ButtonType {
     equals
 }
 
+
+
 component CalcButton inherits Rectangle {
     in-out property <string> text <=> txt.text;
     in-out property <image> icon <=> icon.source;
@@ -22,43 +26,46 @@ component CalcButton inherits Rectangle {
     in-out property <color> button-color: #456;
     in-out property <color> hover-color: #39434D;
     in-out property <color> pressed-color: #162D42;
-    in-out property <length> font_size: 15pt;
     in-out property <length> borders_radius: 15px;
     in-out property <color> text-color: white;
     in-out property <ButtonType> button-type: ButtonType.number;
     in-out property <string> button-id: "";
 
     callback clicked(ButtonType, string);
+
     horizontal-stretch: compact ? 0 : 1;
     vertical-stretch: compact ? 0 : 1;
-    min-width: max(txt.preferred-width, icon.width) + 16px;
-    min-height: max(txt.preferred-width, icon.width) + 12px;
-    preferred-width: max(txt.preferred-width, icon.width) + 16px;
-    preferred-height: max(txt.preferred-width, icon.width) + 12px;
+
+    min-width: 50px;
+    min-height: 40px;
+
     border-radius: borders_radius;
     border-width: 1px;
     border-color: root.background.darker(25%);
     background: touch.pressed ? pressed-color : touch.has-hover ? hover-color : button-color;
-    
+
     txt := Text {
-        x: (parent.width - self.preferred-width)/2; 
-        y: (parent.height - self.preferred-height)/2;
+        font-size: parent.height * 0.4;
         color: text-color;
-        font-size: font_size;
         font-weight: 500;
+        x: (parent.width - self.preferred-width)/2;
+        y: (parent.height - self.preferred-height)/2;
+        horizontal-alignment: center;
+        vertical-alignment: center;
     }
-    
+
     icon := Image {
+        height: parent.height * 0.5; 
         x: (parent.width - self.width)/2;
-        y: (parent.height - self.height)/2; 
+        y: (parent.height - self.height)/2;
     }
-    
-    touch := TouchArea { 
-        clicked => {
-            root.clicked(root.button-type, root.button-id);
-        }
+
+    touch := TouchArea {
+        clicked => root.clicked(root.button-type, root.button-id);
     }
 }
+
+
 
 export component MainWindow inherits Window {
     min-width: 350px;
@@ -97,7 +104,7 @@ export component MainWindow inherits Window {
             CalcButton {
                 icon: settings;
                 compact: true;
-                font_size: 12pt;
+                //font_size: 12pt;
                 borders_radius: 10px;
                 button-color: #666;
                 hover-color: #777;
@@ -118,7 +125,7 @@ export component MainWindow inherits Window {
             border-color: AppTheme.background.darker(30%);
             
             VerticalBox {
-                horizontal-stretch: 1; // <- ключевой момент
+                horizontal-stretch: 1; 
                 padding: 15px;
                 spacing: 5px;
 
@@ -131,7 +138,7 @@ export component MainWindow inherits Window {
                     vertical-alignment: top;
                     horizontal-alignment: right;
                     overflow: elide;
-                    horizontal-stretch: 1; // <- важно
+                    horizontal-stretch: 1;
                 }
 
                 // Main display
@@ -143,7 +150,7 @@ export component MainWindow inherits Window {
                     color: AppTheme.text;
                     vertical-alignment: center;
                     overflow: elide;
-                    horizontal-stretch: 1; // <- ключевой момент
+                    horizontal-stretch: 1; 
                 }
             }
         }
@@ -186,6 +193,8 @@ export component MainWindow inherits Window {
                 root.button-pressed(ButtonType.function, "backspace");
             } else if (event.text == Key.Escape) { // Delete
                 root.button-pressed(ButtonType.clear, "clear");
+            } else if (event.text == Key.Delete) { // Delete
+                root.button-pressed(ButtonType.clear, "clear");
             }
             accept
         }
@@ -193,9 +202,6 @@ export component MainWindow inherits Window {
 
         }
         padding: 10px;
-
-
-        // Calc display
 
 
         // Btns
@@ -209,7 +215,7 @@ export component MainWindow inherits Window {
                 button-color: #666;
                 hover-color: #777;
                 pressed-color: #555;
-           
+
                 button-type: ButtonType.parenthesis;
                 button-id: "open-paren";
                 clicked(type, id) => { root.button-pressed(type, id); }
