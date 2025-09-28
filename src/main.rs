@@ -1,3 +1,8 @@
+//*           UrbanCalc          *//
+//*    Developer: Urban Egor    *//
+//*     Version: 1.4.112 r      *//
+
+
 slint::include_modules!();
 
 
